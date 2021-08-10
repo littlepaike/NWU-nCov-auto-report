@@ -15,8 +15,8 @@ import argparse
 auth_mode = "PASSWORD"  #1:PASSWORD 2:COOKIES
 
 #统一身份认证账号密码，仅在“PASSWORD”认证模式下需要
-stu_id = ""
-stu_passwd = ""
+stu_id = "202032908"
+stu_passwd = "SimplyLeaf.."
 
 #app.nwu.edu.cn认证Cookies，仅在“COOKIES”认证模式下需要
 #可以通过浏览器直接获取
