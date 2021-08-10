@@ -292,7 +292,7 @@ def dojob():
         trigger='cron',
         minute=1,
         hour=12,
-    ) 
+    )
     scheduler.add_job(
         autoReport,
         trigger='cron',
@@ -303,4 +303,5 @@ def dojob():
 
 
 if __name__ == '__main__':
+    autoReport()
     dojob()
