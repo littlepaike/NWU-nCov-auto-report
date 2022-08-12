@@ -11,7 +11,6 @@ from apscheduler.schedulers.blocking import BlockingScheduler
 from bs4 import BeautifulSoup
 import argparse
 
-
 # print(all_line)
 
 
@@ -238,13 +237,13 @@ def sent_report(cookies):
     return json_res['m']
 
 
-def main(stu_id, stu_passwd,stu_name):
+def main(stu_id, stu_passwd, stu_name):
     cookies_res = {}
     global retry_max
 
     cookies_res = get_cookies(stu_id, stu_passwd)
 
-    now_time= time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
     if len(cookies_res) <= 0:
         print("[ERROR] Terminated...")
@@ -257,7 +256,7 @@ def main(stu_id, stu_passwd,stu_name):
                 f.write(f"{now_time},{stu_name}填报成功\n")
             return res
         elif res == "您已上报过" or res == "未到上报时间":
-            print(stu_name+'还不用填报哦~')
+            print(stu_name + '还不用填报哦~')
             with open("log.txt", "a") as f:
                 f.write(f"{now_time},{stu_name}还不用填报哦\n")
             return res
@@ -265,7 +264,7 @@ def main(stu_id, stu_passwd,stu_name):
             if retry_max > 0:
                 print("Retry " + str(retry_max) + ":")
                 retry_max = retry_max - 1
-                main(stu_id, stu_passwd,stu_name)
+                main(stu_id, stu_passwd, stu_name)
             else:
                 print("\n[ERROR] [FINAL] 超过最大重试次数，填报失败！")
 
@@ -281,7 +280,8 @@ def autoReport():
         stu_id = item[0]
         stu_passwd = item[1]
         stu_name = item[2]
-        main(stu_id, stu_passwd,stu_name)
+        main(stu_id, stu_passwd, stu_name)
+
 
 def dojob():
     # 创建调度器：BlockingScheduler

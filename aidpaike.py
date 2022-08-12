@@ -5,25 +5,17 @@ import urllib
 # model name: pycryptodome
 from Crypto.Cipher import AES
 import base64
+from apscheduler.schedulers.blocking import BlockingScheduler
 from Crypto.Util.Padding import pad
 from bs4 import BeautifulSoup
 import argparse
+import time
 
 # Settings aera
 
-# 登陆模式
-auth_mode = "PASSWORD"  # 1:PASSWORD 2:COOKIES
-
 # 统一身份认证账号密码，仅在“PASSWORD”认证模式下需要
 stu_id = "202221493"
-stu_passwd = "SimplyLeaf.."
-
-# app.nwu.edu.cn认证Cookies，仅在“COOKIES”认证模式下需要
-# 可以通过浏览器直接获取
-stu_varify_cookies = {
-    "UUkey": "",
-    "eai-sess": ""
-}
+stu_passwd = "fanzhenye@666"
 
 # 调试信息开关
 debug_mode = False
@@ -249,19 +241,12 @@ def sent_report(cookies):
     return json_res['m']
 
 
-def main(username='', password=''):
+def main(username='', password='', stu_name='游客'):
     cookies_res = {}
     global retry_max
 
-    if auth_mode == "PASSWORD":
-        print("USE PASSWORD MODE")
-        cookies_res = get_cookies(username=stu_id, password=stu_passwd)
-    elif auth_mode == "COOKIES":
-        print("USE COOKIES MODE")
-        cookies_res = stu_varify_cookies
-    else:
-        print("[ERROR] Unknow auth mode")
-        return "Unknow auth mode"
+    cookies_res = get_cookies(username=stu_id, password=stu_passwd)
+    now_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
     if len(cookies_res) <= 0:
         print("[ERROR] Terminated...")
@@ -270,9 +255,13 @@ def main(username='', password=''):
         res = sent_report(cookies=cookies_res)
         if res == "操作成功":
             print("\n[FINAL] 自动填报成功")
+            with open("log.txt", "a") as f:
+                f.write(f"{now_time},{stu_name}填报成功\n")
             return res
         elif res == "您已上报过" or res == "未到上报时间":
             print("\n[FINAL] 还不用填报哦~")
+            with open("log.txt", "a") as f:
+                f.write(f"{now_time},{stu_name}还不用填报哦\n")
             return res
         else:
             if retry_max > 0:
@@ -283,28 +272,39 @@ def main(username='', password=''):
                 print("\n[ERROR] [FINAL] 超过最大重试次数，填报失败！")
 
 
+def autoReport():
+    all_line = []
+    with open("id.txt", "r") as f:
+        for line in f:
+            single_line = line.strip("\n").split(' ')
+            all_line.append(single_line)
+
+    for item in all_line:
+        stu_id = item[0]
+        stu_passwd = item[1]
+        stu_name = item[2]
+        main(stu_id, stu_passwd, stu_name)
+
+
+def dojob():
+    # 创建调度器：BlockingScheduler
+    print("开始任务")
+    scheduler = BlockingScheduler()
+    scheduler.add_job(
+        autoReport,
+        trigger='cron',
+        minute=1,
+        hour=12,
+    )
+    scheduler.add_job(
+        autoReport,
+        trigger='cron',
+        minute=1,
+        hour=0,
+    )
+    scheduler.start()
+
+
 if __name__ == "__main__":
-
-    # CLI
-    parser = argparse.ArgumentParser(description='Auto report CLI')
-    parser.add_argument('--cli', type=bool, default=False,
-                        help="是否使用命令行参数")  # Is call by cli. If false, use settings at the begining of this file.
-    parser.add_argument('--auth_mode', type=str, default="PASSWORD", help="认证模式")
-    parser.add_argument('--username', type=str, default=None, help="学工号")
-    parser.add_argument('--password', type=str, default=None, help="统一身份认证密码")
-    parser.add_argument('--eai-sess', type=str, default=None, help="认证Cookies")
-    parser.add_argument('--UUkey', type=str, default=None, help="认证Cookies")
-    args = parser.parse_args()
-    # print("Inpute：", args)
-
-    if args.cli == True:
-        print("Load settings from CLI args...")
-        auth_mode = args.auth_mode
-        stu_id = args.username
-        stu_passwd = args.password
-        stu_varify_cookies['UUkey'] = args.UUkey
-        stu_varify_cookies['eai-sess'] = args.eai_sess
-    elif args.cli == False:
-        print("Load Setting in file...")
-
-    main()
+    autoReport()
+    dojob()
