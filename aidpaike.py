@@ -288,7 +288,7 @@ def main(username='', password='', stu_name='游客'):
 
 def autoReport():
     all_line = []
-    with open("id.txt", "r") as f:
+    with open("Id.txt", "r") as f:
         for line in f:
             single_line = line.strip("\n").split(' ')
             all_line.append(single_line)
@@ -309,12 +309,14 @@ def dojob():
         trigger='cron',
         minute=1,
         hour=12,
+        timezone='Asia/Shanghai'
     )
     scheduler.add_job(
         autoReport,
         trigger='cron',
         minute=1,
         hour=0,
+        timezone='Asia/Shanghai'
     )
     scheduler.start()
 
