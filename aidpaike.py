@@ -10,6 +10,8 @@ from Crypto.Util.Padding import pad
 from bs4 import BeautifulSoup
 import argparse
 import time
+import os
+from shutil import copyfile
 
 # Settings aera
 
@@ -321,6 +323,16 @@ def dojob():
     scheduler.start()
 
 
+def init_data():
+    prePath_data = "id.txt"
+    finPath_data = "data/id.txt"
+    prePath_log = "log.txt"
+    finPath_log = "log/log.txt"
+    copyfile(prePath_data, finPath_data)
+    copyfile(prePath_log, finPath_log)
+
+
 if __name__ == "__main__":
+    init_data()
     autoReport()
     dojob()
