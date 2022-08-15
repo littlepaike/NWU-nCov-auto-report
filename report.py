@@ -252,12 +252,12 @@ def main(stu_id, stu_passwd, stu_name):
         res = sent_report(cookies=cookies_res)
         if res == "操作成功":
             print(f"{stu_name}自动填报成功")
-            with open("log.txt", "a") as f:
+            with open("log/log.txt", "a") as f:
                 f.write(f"{now_time},{stu_name}填报成功\n")
             return res
         elif res == "您已上报过" or res == "未到上报时间":
             print(stu_name + '还不用填报哦~')
-            with open("log.txt", "a") as f:
+            with open("log/log.txt", "a") as f:
                 f.write(f"{now_time},{stu_name}还不用填报哦\n")
             return res
         else:
@@ -271,7 +271,7 @@ def main(stu_id, stu_passwd, stu_name):
 
 def autoReport():
     all_line = []
-    with open("id.txt", "r") as f:
+    with open("data/id.txt", "r") as f:
         for line in f:
             single_line = line.strip("\n").split(' ')
             all_line.append(single_line)
